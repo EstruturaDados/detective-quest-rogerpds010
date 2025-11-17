@@ -1,4 +1,72 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+//==============================================================
+// Estrutura que representa cada sala da mansão
+//==============================================================
+typedef struct Sala {
+    char nome[50];
+    struct Sala *esquerda;
+    struct Sala *direita;
+} Sala;
+
+//==============================================================
+// Função: criarSala
+// Cria dinamicamente uma sala com o nome informado
+//==============================================================
+Sala* criarSala(char nome[]) {
+    Sala *nova = (Sala*) malloc(sizeof(Sala));
+
+    if (nova == NULL) {
+        printf("Erro ao alocar memoria para a sala.\n");
+        exit(1);
+    }
+
+    strcpy(nova->nome, nome);
+    nova->esquerda = NULL;
+    nova->direita = NULL;
+
+    return nova;
+}
+
+//==============================================================
+// Função: explorarSalas
+// Permite ao jogador explorar a mansão interativamente
+//==============================================================
+void explorarSalas(Sala *atual) {
+    char escolha;
+
+    while (1) {
+        printf("\nVocê está em: %s\n", atual->nome);
+
+        // Se chegou em um nó-folha (sem caminhos)
+        if (atual->esquerda == NULL && atual->direita == NULL) {
+            printf("Você chegou a um cômodo sem saídas. Fim da exploração!\n");
+            break;
+        }
+
+        printf("Escolha seu caminho:\n");
+        if (atual->esquerda != NULL) printf("[e] Ir para a esquerda (%s)\n", atual->esquerda->nome);
+        if (atual->direita != NULL) printf("[d] Ir para a direita (%s)\n", atual->direita->nome);
+        printf("[s] Sair da exploração\n");
+        printf("Opção: ");
+
+        scanf(" %c", &escolha);
+
+        if (escolha == 'e' && atual->esquerda != NULL) {
+            atual = atual->esquerda;
+        } else if (escolha == 'd' && atual->direita != NULL) {
+            atual = atual->direita;
+        } else if (escolha == 's') {
+            printf("Exploração encerrada pelo jogador.\n");
+            break;
+        } else {
+            printf("Opção inválida! Tente novamente.\n");
+        }
+    }
+}
+
 
 // Desafio Detective Quest
 // Tema 4 - Árvores e Tabela Hash
@@ -7,6 +75,26 @@
 
 int main() {
 
+    // Criando manualmente o mapa da mansão (árvore binária fixa)
+    Sala *hall      = criarSala("Hall de Entrada");
+    Sala *salaEstar = criarSala("Sala de Estar");
+    Sala *cozinha   = criarSala("Cozinha");
+    Sala *biblioteca= criarSala("Biblioteca");
+    Sala *jardim    = criarSala("Jardim");
+
+    // Montando a árvore
+    hall->esquerda = salaEstar;
+    hall->direita  = cozinha;
+
+    salaEstar->esquerda = biblioteca;  // exemplo de caminho
+    salaEstar->direita  = jardim;      // outro caminho
+
+    // Iniciando a exploração
+    printf("=== Detective Quest: Explorador da Mansão ===\n");
+    printf("Bem-vindo ao sistema de exploração da mansão!\n");
+
+    explorarSalas(hall);
+    
     // 🌱 Nível Novato: Mapa da Mansão com Árvore Binária
     //
     // - Crie uma struct Sala com nome, e dois ponteiros: esquerda e direita.
